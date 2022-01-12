@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "sort.h"
 
-void swap(int *a, int *b);
-int partition(int arr[], int low, int high);
-void quickSort(int arr[], int low, int high);
+void swap(int *x, int *y);
+size_t partition(int array[], size_t size);
+void print_sort(int array[], size_t size, int init);
 
 /**
  * quick_sort - the function that initiate the quick sort
@@ -14,69 +14,89 @@ void quickSort(int arr[], int low, int high);
 
 void quick_sort(int *array, size_t size)
 {
-	if (size < 2)
+	size_t pivot;
+
+	if (!array || size < 2)
 		return;
-	quickSort(array, 0, size - 1);
 
+	print_sort(array, size, 1);
+
+	pivot = partition(array, size);
+
+	quick_sort(array, pivot);
+	quick_sort(array + pivot, size - pivot);
 }
 
 /**
- * swap - function that swap two numbers
- * @a: the first number
- * @b: the second number
+ * swap - function that swaps two numbers
+ * @x: fisrt numbers
+ * @y: second numbers
  */
 
-
-void swap(int *a, int *b)
+void swap(int *x, int *y)
 {
-	int t = *a;
+	int tmp;
 
-	*a = *b;
-	*b = t;
+	tmp = *y;
+	*y = *x;
+	*x = tmp;
 }
 
 /**
- * partition - function that takes last element as pivot
- * @arr: the array to be sorted
- * @low: the starting index
- * @high: the ending index
- * Return: int value
+ * partition - Function that sets the pivot for quick_sort
+ * @array: Array to partition
+ * @size: Size of array
+ * Return: the pivot
  */
 
-int partition(int arr[], int low, int high)
+size_t partition(int array[], size_t size)
 {
-	int pivot = arr[high];
-	int i = (low - 1);
-	int j;
+	int pivot;
+	size_t i = -1;
+	size_t j;
 
-	for (j = low; j <= high - 1; j++)
+	if (!array || size < 2)
+		return (0);
+
+	pivot = array[size - 1];
+
+	for (j = 0; j < size - 1; j++)
 	{
-		if (arr[j] < pivot)
+		if (array[j] <= pivot)
 		{
 			i++;
-			swap(&arr[i], &arr[j]);
+			if (i != j)
+			{
+				swap(&array[i], &array[j]);
+				print_sort(array, size, 0);
+			}
 		}
 	}
-	swap(&arr[i + 1], &arr[high]);
+	if (i + 1 != size - 1)
+	{
+		swap(&array[i + 1], &array[size - 1]);
+		print_sort(array, size, 0);
+	}
 	return (i + 1);
 }
 
 /**
- * quickSort - the function that implement the quick Sort
- * @arr: the array to be sorted
- * @low: the starting index
- * @high: the ending index
+ * print_sort - Function that prints as it should
+ * @array: Array to be printed
+ * @size: Size of array
+ * @init: Should initialize array
  */
 
-void quickSort(int arr[], int low, int high)
+void print_sort(int array[], size_t size, int init)
 {
-	int pi;
+	static int *p = (void *)0;
+	static size_t s;
 
-	if (low < high)
+	if (!p && init)
 	{
-		pi = partition(arr, low, high);
-
-		quickSort(arr, low, pi - 1);
-		quickSort(arr, pi + 1, high);
+		p = array;
+		s = size;
 	}
+	if (!init)
+		print_array(p, s);
 }
