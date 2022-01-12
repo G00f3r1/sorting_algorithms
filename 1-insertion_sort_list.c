@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include "sort.h"
 
+void swap_forward(listint_t *c);
+void swap_backward(listint_t *c);
+
 /**
  * insertion_sort_list - function that sorts a doubly linked list
  * of integers in ascending order using the Insertion sort algorithm
@@ -10,33 +13,89 @@
 
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *head = NULL;
-	listint_t *current = NULL;
-	listint_t *p = NULL;
+	listint_t *c;
 
-	while (list != NULL)
+	if ((list == NULL) || (*list == NULL) || ((*list)->next == NULL))
+		return;
+	c = *list;
+
+	while (c->next != NULL)
 	{
-		current = *list;
-		*list = *list->next;
-		if(head == NULL || current->n < head->n)
+		if (c->n > c->next->n)
 		{
-			current->next = head;
-			head = current;
+			swap_forward(c);
 		}
 		else
+			c = c->next;
+	}
+	while ((*list)->prev != NULL)
+		*list = (*list)->prev;
+}
+
+/**
+ * swap_forward - function that swap two nodes from left to right position
+ * @c: the list
+ */
+
+void swap_forward(listint_t *c)
+{
+	listint_t *tmp, *head;
+
+	tmp = c->prev;
+
+	if (tmp != NULL)
+	{
+		tmp->next = c->next;
+		c->next->prev = tmp;
+	}
+	else
+		c->next->prev = NULL;
+	c->prev = c->next;
+	if (c->next->next != NULL)
+	{
+		c->next = c->next->next;
+		c->prev->next = c;
+		c->next->prev = c;
+	}
+	else
+	{
+		c->next->next = c;
+		c->next = NULL;
+	}
+	head = c;
+	while (head->prev != NULL)
+		head = head->prev;
+	print_list(head);
+	swap_backward(c->prev);
+}
+
+/**
+ * swap_backward - function that swap two nodes from right to left position
+ * @c: the list
+ */
+
+void swap_backward(listint_t *c)
+{
+	listint_t *tmp, *head;
+
+	while (c->prev != NULL)
+	{
+		if (c->n < c->prev->n)
 		{
-			p = head;
-			while (p != NULL)
-			{
-				if (p->next == NULL || current->n < p->next->n)
-				{
-					current->next = p->next;
-					p->next = current;
-					break;
-				}
-				p = p->next;
-			}
+			tmp = c->prev->prev;
+			c->prev->next = c->next;
+			c->next = c->prev;
+			c->prev->prev = c;
+			c->prev = tmp;
+			c->next->next->prev = c->next;
+			if (tmp != NULL)
+				tmp->next = c;
+			head = c;
+			while (head->prev != NULL)
+				head = head->prev;
+			print_list(head);
 		}
-		print_list(*list);
+		else
+			c = c->prev;
 	}
 }
